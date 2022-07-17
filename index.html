@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My To Do App</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!-- HTML part of View V-->
+    <main class="main">
+      <h3>Welcome to Todo Web App</h3>
+      <input id="todo-title" type="text" />
+      <input id="date-picker" type="date" />
+      <button onclick="addTodo()">Add Todo</button>
+      <!-- End of the HTML part of View V-->
+
+      <div id="todo-list">
+        <!-- the list is going to be presented here by render function using 
+            id of this div -->
+      </div>
+    </main>
+    <script>
+      //Model M
+
+      // If lcoal storage have todos array then use it
+      // Otherwise use the default array
+
+      let todos;
+
+      // Retrieve localStorage
+      const savedTdods1 = localStorage.getItem("todos");
+
+      // convert it to an array or object
+      const savedTdods = JSON.parse(savedTdods1);
+
+      // Check if it's an array
+      if (Array.isArray(savedTdods)) {
+        todos = savedTdods;
+      } else {
+        todos = [
+          {
+            title: "Get groceries",
+            dueDate: "2021-10-04",
+            id: "id1",
+          },
+          {
+            title: "Wash car",
+            dueDate: "2021-02-03",
+            id: "id2",
+          },
+          {
+            title: "Make dinner",
+            dueDate: "2021-03-04",
+            id: "id3",
+          },
+        ];
+      }
+
+      //Creates a todo
+      function createTodo(title, dueDate) {
+        // just to create a random ID we use Date().getTime();
+        // change it to string by adding ''+ to it
+        const id = "" + new Date().getTime();
+
+        todos.push({
+          title: title,
+          dueDate: dueDate,
+          id: id,
+        });
+
+        saveTodos();
+      }
+
+      //Deletes a todo
+      function removeTodo(idToDelete) {
+        todos = todos.filter(function (todo) {
+          //if the id of this todo matches idToDelete. return false(delete it)
+          //for everything else return true (keep it)
+          if (todo.id === idToDelete) {
+            return false;
+          } else {
+            return true;
+          }
+        });
+        saveTodos();
+      }
+      //Save todos
+      function saveTodos() {
+        localStorage.setItem("todos", JSON.stringify(todos));
+      }
+
+      // End of Model M
+
+      // View V
+      function render() {
+        // reset the list first
+        document.getElementById("todo-list").innerHTML = "";
+        
+        //re-add the list
+        todos.forEach(function (todo) {
+          let element = document.createElement("div");
+          
+          
+          element.innerText = todo.title + "   |"+todo.dueDate ;
+         
+          // create a delete button to delete todos from list
+          const deleteButton = document.createElement("button");
+          deleteButton.innerText = "Delete";
+
+          // to use HTML & CSS inside JS using DOM
+          deleteButton.style = "margin-left: 12px";
+          deleteButton.onclick = deleteTodo;
+          deleteButton.id = todo.id;
+
+          element.appendChild(deleteButton);
+
+          let todoList = document.getElementById("todo-list");
+          todoList.appendChild(element);
+        
+          
+        });
+      }
+      // End of View V
+
+      render();
+      // Controller C
+      function addTodo() {
+        const textbox = document.getElementById("todo-title");
+        const title = textbox.value;
+
+        // create a variable to store date picker
+        const datePicker = document.getElementById("date-picker");
+        const dueDate = datePicker.value;
+
+        createTodo(title, dueDate);
+
+        render();
+      }
+
+      function deleteTodo(event) {
+        const deleteButton = event.target;
+        const idToDelete = deleteButton.id;
+
+        removeTodo(idToDelete);
+
+        render();
+      }
+      //  End of Controller C
+    </script>
+  </body>
+</html>
